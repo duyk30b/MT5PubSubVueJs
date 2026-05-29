@@ -1,0 +1,27 @@
+{
+  "window.title": "${rootName}",
+  "explorer.compactFolders": false,
+  "workbench.tree.indent": 16,
+  "workbench.editor.wrapTabs": true,
+  "workbench.editor.enablePreview": false,
+  "git.allowForcePush": true,
+  "files.autoSave": "afterDelay",
+  "files.eol": "\n",
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "editor.inlayHints.fontSize": 10,
+  "editor.suggest.insertMode": "replace",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "search.exclude": {
+    "docs/**": true
+  },
+  "search.smartCase": true,
+  "js/ts.preferences.quoteStyle": "single",
+  "js/ts.format.semicolons": "remove",
+  "js/ts.updateImportsOnFileMove.enabled": "always",
+  "js/ts.inlayHints.parameterNames.enabled": "literals",
+  "cSpell.language": "en,vi",
+  "cSpell.words": []
+}
