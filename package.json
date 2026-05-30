@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dexie": "^4.4.3",
     "pinia": "^3.0.4",
     "socket.io-client": "^4.8.3",
     "vue": "^3.5.35",
@@ -27,6 +28,7 @@
     "sass-embedded": "^1.100.0",
     "typescript": "^6.0.3",
     "vite": "^7.3.3",
-    "vite-plugin-vue-devtools": "^8.1.2"
+    "vite-plugin-vue-devtools": "^8.1.2",
+    "vue-tsc": "^3.3.2"
   }
 }

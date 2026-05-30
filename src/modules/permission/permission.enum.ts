@@ -1,0 +1,7 @@
+export enum PermissionId {
+  USER = 1,
+  USER_ACCOUNT_MENU = 101,
+  USER_ACCOUNT_CRUD = 102,
+  USER_ROLE_MENU = 111,
+  USER_ROLE_CRUD = 112,
+}

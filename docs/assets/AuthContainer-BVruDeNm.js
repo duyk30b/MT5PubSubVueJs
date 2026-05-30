@@ -1,0 +1,1 @@
+import{_ as o}from"./src_common-Dcyt8GLR.js";import{x as t,e as r,E as n}from"./vendor_node_modules-CpIDSEJf.js";const c={};function s(_,a){const e=n("RouterView");return t(),r(e)}const m=o(c,[["render",s]]);export{m as default};
