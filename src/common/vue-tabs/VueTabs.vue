@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, provide, watch } from 'vue'
+import { provide, ref, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -18,7 +18,7 @@ const props = withDefaults(
   }>(),
   {
     tabShow: 0,
-  }
+  },
 )
 const emit = defineEmits<{ (e: 'update:tabShow', value: string | number): void }>()
 const tabSelect = ref<string | number>(props.tabShow)
@@ -27,7 +27,7 @@ watch(
   (newVal) => {
     tabSelect.value = newVal
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const listenTabMenuChange = (value: string | number) => {
@@ -41,15 +41,26 @@ provide('tabSelect', tabSelect)
 
 <style lang="scss">
 .vue-tabs {
+  border-radius: 12px;
+
   .tab-menu {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
     padding: 0 4px;
-    border-bottom: 1px solid #cdcdcd;
+    border-bottom: 1px solid var(--dashboard-line);
+    background: color-mix(in srgb, var(--dashboard-panel) 88%, var(--dashboard-bg) 12%);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
   }
+
   .tab-panel {
-    background-color: #fff;
+    background-color: var(--dashboard-panel);
+    border: 1px solid var(--dashboard-line);
+    border-top: none;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 4px;
   }
 }
 </style>

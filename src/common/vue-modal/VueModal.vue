@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { PropType, StyleValue } from 'vue'
+import type { StyleValue } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -50,9 +50,10 @@ const closeModal = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--dashboard-overlay);
   display: flex;
   transition: opacity 0.2s ease;
+  backdrop-filter: blur(2px);
 }
 
 .modal-container {
@@ -60,12 +61,14 @@ const closeModal = () => {
   max-height: 90%;
   overflow-y: auto;
   width: 800px;
+  border: 1px solid var(--dashboard-line);
+  background: var(--dashboard-panel);
   margin-top: auto;
   margin-bottom: auto;
   margin-left: auto;
   margin-right: auto;
-  border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  border-radius: 14px;
+  box-shadow: var(--control-dropdown-shadow);
   transition: all 0.2s ease;
 }
 
@@ -79,7 +82,7 @@ const closeModal = () => {
 
 .modal-enter-from .modal-container,
 .modal-leave-to .modal-container {
-  -webkit-transform: scale(0.8);
-  transform: scale(0.8);
+  -webkit-transform: scale(0.92) translateY(8px);
+  transform: scale(0.92) translateY(8px);
 }
 </style>

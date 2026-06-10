@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import { ROUTER_NAME } from '@/router/router_name'
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import VueButton from '../../common/VueButton.vue'
 import { AlertStore } from '../../common/vue-alert/vue-alert.store'
-import { InputPassword } from '../../common/vue-form'
-import InputText from '../../common/vue-form/InputText.vue'
-import { VueDivider } from '../../common/vue-layout'
+import { InputPassword, InputText } from '../../common/vue-form'
 
 const router = useRouter()
 const route = useRoute()
@@ -25,7 +24,7 @@ const startResetPassword = async () => {
       return AlertStore.addError('Điền mật khẩu lần 2 không chính xác')
     }
     AlertStore.addSuccess('Thay đổi mật khẩu thành công. Vui lòng đăng nhập lại để vào ứng dụng')
-    router.push({ name: 'Login' })
+    router.push({ name: ROUTER_NAME.LOGIN })
   } catch (error: any) {
     const message = error?.response?.data?.message || error.message || error?.config.signal?.reason
     AlertStore.addError(message)
@@ -36,80 +35,48 @@ const startResetPassword = async () => {
 </script>
 
 <template>
-  <div class="wrapper">
-    <div class="form-card pt-4 pb-10 px-4">
-      <VueDivider class="mt-4" border-width="1px">
-        <div class="mx-4 text-2xl font-medium">ĐỔI MẬT KHẨU</div>
-      </VueDivider>
-      <form @submit.prevent="startResetPassword">
-        <div class="mt-4">
-          <div>Tài khoản</div>
-          <div>
-            <InputText v-model:value="formState.username" name="username" required />
-          </div>
-        </div>
-        <div class="mt-4">
-          <div>Mật khẩu</div>
-          <div>
-            <InputPassword v-model:value="formState.password" name="password" required />
-          </div>
-        </div>
-        <div class="mt-4">
-          <div>Điền lại mật khẩu</div>
-          <div>
-            <InputPassword v-model:value="formState.passwordRepeat" name="password" required />
-          </div>
-        </div>
+  <section class="auth-panel">
+    <p class="panel-kicker">Đặt lại mật khẩu</p>
+    <h2>Tạo mật khẩu mới</h2>
+    <p class="panel-description">Đảm bảo mật khẩu đủ mạnh và không trùng với mật khẩu cũ.</p>
 
-        <div class="mt-8 flex justify-center">
-          <VueButton color="blue" type="submit" :loading="loading">Cập nhật mật khẩu mới</VueButton>
-        </div>
-      </form>
-    </div>
-    <div class="company-text">
-      <p>Công ty TNHH Công nghệ và TM MEDIHOME</p>
-      <p>
-        HOTLINE:
-        <a href="tel:0376899866" class="hotline">0376.899.866</a>
-      </p>
-    </div>
-  </div>
+    <form class="auth-form" @submit.prevent="startResetPassword">
+      <label class="field-label" for="reset-username">Tài khoản</label>
+      <InputText
+        id="reset-username"
+        v-model:value="formState.username"
+        name="username"
+        placeholder="Nhập tài khoản"
+        required
+      />
+
+      <label class="field-label" for="reset-password">Mật khẩu mới</label>
+      <InputPassword
+        id="reset-password"
+        v-model:value="formState.password"
+        name="password"
+        placeholder="Nhập mật khẩu mới"
+        required
+      />
+
+      <label class="field-label" for="reset-password-repeat">Nhập lại mật khẩu mới</label>
+      <InputPassword
+        id="reset-password-repeat"
+        v-model:value="formState.passwordRepeat"
+        name="password-repeat"
+        placeholder="Nhập lại mật khẩu mới"
+        required
+      />
+
+      <button class="auth-link" type="button" @click="router.push({ name: ROUTER_NAME.LOGIN })">
+        Quay lại đăng nhập
+      </button>
+
+      <VueButton class="submit-btn" color="blue" size="large" type="submit" :loading="loading">
+        Cập nhật mật khẩu mới
+      </VueButton>
+    </form>
+
+    <p class="panel-note">Mật khẩu nên có chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
+  </section>
 </template>
-
-<style lang="scss" scoped>
-.wrapper {
-  width: 100vw;
-  height: 100vh;
-  // background-image: url('@/assets/image/background-login.jpg');
-  background-position: center;
-  background-color: #3b6fba;
-  background-repeat: no-repeat;
-  background-size: cover;
-  padding-top: 10%;
-
-  .form-card {
-    max-width: 600px;
-    width: 90%;
-    margin: 0 auto;
-    border-radius: 10px;
-    box-shadow:
-      0px 3px 5px rgba(0, 0, 0, 0.02),
-      0px 0px 2px rgba(0, 0, 0, 0.05),
-      0px 1px 4px rgba(0, 0, 0, 0.08);
-    background-color: #fff;
-  }
-
-  .company-text {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    text-transform: uppercase;
-    font-weight: bold;
-    color: #fff;
-
-    .hotline {
-      color: #fff;
-    }
-  }
-}
-</style>

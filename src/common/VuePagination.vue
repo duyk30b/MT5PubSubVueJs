@@ -112,47 +112,66 @@ const clickChangePage = (pageClick: number) => {
 .vue-pagination {
   display: flex;
   gap: 8px;
+
   .pagination-item {
-    padding: 5px 10px 5px 10px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 5px 10px;
     text-align: center;
-    background-color: #fff;
+    background: var(--control-bg);
+    color: var(--control-text);
     cursor: pointer;
     user-select: none;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 8px;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+
     &.pagination-item-number {
-      border: 1px solid #d9d9d9;
-      border-radius: 2px;
+      border: 1px solid var(--control-border);
     }
+
     &.pagination-item-disabled {
       cursor: not-allowed;
       opacity: 0.7;
+      background: var(--control-bg-disabled);
     }
+
     &:hover {
       font-weight: 500;
-      color: #1890ff;
-      border-color: #1890ff;
+      color: var(--dashboard-primary-600);
+      border-color: var(--control-border-hover);
+      background: var(--control-bg-hover);
     }
+
     &.pagination-item-active {
       font-weight: 700;
-      color: #1890ff;
-      border-color: #1890ff;
+      color: var(--control-active-text);
+      border-color: var(--control-active-bg);
+      background: var(--control-active-bg);
     }
+
     &.pagination-item-link {
-      border: 1px solid #d9d9d9;
-      border-radius: 2px;
+      border: 1px solid var(--control-border);
       font-size: 0.9em;
     }
 
     &.pagination-item-jump {
       border: none;
+      background: transparent;
+
       .pagination-item-ellipsis {
         display: inline;
       }
+
       .pagination-item-hover {
         display: none;
       }
+
       &:hover {
         .pagination-item-ellipsis {
           display: none;

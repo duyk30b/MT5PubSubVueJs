@@ -7,7 +7,7 @@ export const CONFIG = reactive({
   API_BASE_URL:
     import.meta.env.MODE === 'production'
       ? `https://api.mea.vn`
-      : `http://${location.hostname}:20000`,
+      : `http://${location.hostname}:8000`,
   BUILD_TIME: '',
 })
 ;(window as any)._MEA_CONFIG = CONFIG

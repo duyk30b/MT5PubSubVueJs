@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "vue-tsc -b && vite build",
+    "build": "npm run write-config & vue-tsc -b && vite build",
+    "write-config": "node ./scripts/write-config.js",
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"

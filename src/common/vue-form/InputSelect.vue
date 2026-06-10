@@ -37,7 +37,6 @@
 </template>
 
 <script setup lang="ts">
-import { CONFIG } from '@/config'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 
 export type InputSelectOption<T> = {
@@ -175,28 +174,45 @@ onBeforeUnmount(() => {
 .input-select {
   font-size: 16px;
   position: relative;
+
   .input-select-display {
     padding: 4px 12px 4px 12px;
-    border: 1px solid #d9d9d9;
-    border-radius: 2px;
-    background: white;
+    border: 1px solid var(--control-border);
+    border-radius: 10px;
+    background: var(--control-bg);
+    color: var(--control-text);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 8px;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:focus-visible {
+      border-color: var(--control-border-hover);
+      box-shadow: 0 0 0 3px var(--control-focus-ring);
+    }
+
     &.disabled {
       cursor: not-allowed;
-      background-color: #eeeeee;
+      background-color: var(--control-bg-disabled);
+
       &:hover {
-        border-color: #ccc;
+        border-color: var(--control-border);
       }
     }
+
     &:not(.disabled):hover {
       cursor: pointer;
+
       &:hover {
-        border-color: #40a9ff;
+        border-color: var(--control-border-hover);
+        background: var(--control-bg-hover);
       }
     }
+
     .label {
       flex-grow: 1;
       user-select: none;
@@ -207,9 +223,10 @@ onBeforeUnmount(() => {
     .arrow {
       font-size: 0.9em;
       transform: scaleX(1.6);
-      color: #777;
+      color: var(--control-placeholder);
     }
   }
+
   .development {
     position: absolute;
     right: 5px;
@@ -227,22 +244,27 @@ onBeforeUnmount(() => {
   top: 0;
   left: 0;
   overflow: auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ccc;
-  background: white;
+  box-shadow: var(--control-dropdown-shadow);
+  border: 1px solid var(--control-border);
+  border-radius: 10px;
+  background: var(--control-bg);
   z-index: 9999;
+
   .input-select-option {
     padding: 5px 12px 5px 12px;
     cursor: pointer;
+    color: var(--control-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
     &:hover {
-      background: #e9e9e9;
+      background: var(--control-bg-hover);
     }
+
     &.active {
-      background-color: dodgerblue;
-      color: #fff;
+      background-color: var(--control-active-bg);
+      color: var(--control-active-text);
     }
   }
 }

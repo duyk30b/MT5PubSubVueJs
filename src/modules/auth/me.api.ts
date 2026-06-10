@@ -6,12 +6,11 @@ import { User } from '../user/user.model'
 export class MeApi {
   static async data() {
     const response = await FetchApi.get('/me/data')
-    const data = response.data as any
     return {
-      permissionAll: Permission.fromList(data.permissionAll),
-      permissionIds: data.permissionIds,
-      settingMap: data.settingMap as Record<string, any>,
-      user: User.from(data.user),
+      permissionAll: Permission.fromList(response.permissionAll),
+      permissionIds: response.permissionIds,
+      settingMap: response.settingMap as Record<string, any>,
+      user: User.from(response.user),
     }
   }
 
@@ -23,8 +22,7 @@ export class MeApi {
 
   static async changePassword(oldPassword: string, newPassword: string) {
     const response = await FetchApi.post('/me/change-password', {
-      oldPassword,
-      newPassword,
+      body: { oldPassword, newPassword },
     })
     const { data } = response.data as FullResponse<boolean>
     return data

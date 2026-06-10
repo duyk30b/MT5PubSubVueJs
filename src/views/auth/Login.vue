@@ -1,101 +1,79 @@
 <script setup lang="ts">
+import { AlertStore } from '@/common/vue-alert/vue-alert.store.ts'
+import { ROUTER_NAME } from '@/router/router_name.ts'
+import { useAuthStore } from '@/stores/auth.store.ts'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { InputPassword, InputText } from '../../common/vue-form'
-import { VueDivider } from '../../common/vue-layout'
 import VueButton from '../../common/VueButton.vue'
 
 const router = useRouter()
 
+const authStore = useAuthStore()
+
 const formState = reactive({
   username: '',
   password: '',
-  oid: 1,
-  uid: 0,
 })
 
 const loading = ref(false)
 
-
-
 const startLogin = async () => {
-  loading.value = true
-  loading.value = false
+  try {
+    loading.value = true
+    await authStore.login({
+      username: formState.username,
+      password: formState.password,
+    })
+    router.push({ name: ROUTER_NAME.HOME })
+  } catch (error: any) {
+    AlertStore.addError(error.message || 'Đăng nhập thất bại')
+  } finally {
+    loading.value = false
+  }
 }
-
-
 </script>
 
 <template>
-  <div class="wrapper">
-    <div class="form-card p-4">
-      <VueDivider class="mt-4" border-width="1px">
-        <div class="mx-4 text-2xl font-medium">ĐĂNG NHẬP</div>
-      </VueDivider>
-      <form @submit.prevent="startLogin">
-        <div class="mt-4">
-          <div>Tài khoản</div>
-          <div>
-            <InputText v-model:value="formState.username" name="username" required />
-          </div>
-        </div>
-        <div class="mt-4">
-          <div>Mật khẩu</div>
-          <div>
-            <InputPassword v-model:value="formState.password" name="password" required />
-          </div>
-        </div>
-        <div class="mt-4 flex justify-end">
-          <a @click="$router.push({ name: 'ForgotPassword' })">Quên Mật Khẩu</a>
-        </div>
-        <div class="flex justify-center">
-          <VueButton color="blue" type="submit" :loading="loading">Đăng nhập</VueButton>
-        </div>
-      </form>
-    </div>
-    <div class="company-text">
-      <p>Công ty TNHH Công nghệ và TM MEDIAI</p>
-      <p>
-        HOTLINE:
-        <a href="tel:0376899866" class="hotline">0376.899.866</a>
-      </p>
-    </div>
-  </div>
+  <section class="auth-panel">
+    <p class="panel-kicker">Đăng nhập tài khoản</p>
+    <h2>Chào mừng bạn quay lại</h2>
+    <p class="panel-description">Vui lòng điền thông tin để truy cập hệ thống quản trị.</p>
+
+    <form class="auth-form" @submit.prevent="startLogin">
+      <label class="field-label" for="username">Tài khoản</label>
+      <InputText
+        id="username"
+        v-model:value="formState.username"
+        name="username"
+        placeholder="Nhập tài khoản"
+        autocomplete="on"
+        required
+      />
+
+      <label class="field-label" for="password">Mật khẩu</label>
+      <InputPassword
+        id="password"
+        v-model:value="formState.password"
+        name="password"
+        placeholder="Nhập mật khẩu"
+        autocomplete="on"
+        required
+      />
+
+      <button
+        class="auth-link"
+        type="button"
+        @click="router.push({ name: ROUTER_NAME.FORGOT_PASSWORD })"
+      >
+        Quên mật khẩu?
+      </button>
+
+      <VueButton class="submit-btn" color="blue" size="large" type="submit" :loading="loading">
+        Đăng nhập
+      </VueButton>
+    </form>
+
+    <p class="panel-note">Hệ thống tối ưu cho desktop và mobile, hỗ trợ chế độ sáng/tối.</p>
+  </section>
 </template>
-
-<style lang="scss" scoped>
-.wrapper {
-  width: 100vw;
-  height: 100vh;
-  background-position: center;
-  background-color: #3b6fba;
-  background-repeat: no-repeat;
-  background-size: cover;
-  padding-top: 10%;
-
-  .form-card {
-    max-width: 600px;
-    width: 90%;
-    margin: 0 auto;
-    border-radius: 10px;
-    box-shadow:
-      0px 3px 5px rgba(0, 0, 0, 0.02),
-      0px 0px 2px rgba(0, 0, 0, 0.05),
-      0px 1px 4px rgba(0, 0, 0, 0.08);
-    background-color: #fff;
-  }
-
-  .company-text {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    text-transform: uppercase;
-    font-weight: bold;
-    color: #fff;
-
-    .hotline {
-      color: #fff;
-    }
-  }
-}
-</style>

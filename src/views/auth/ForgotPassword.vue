@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { ROUTER_NAME } from '@/router/router_name'
 import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { AlertStore } from '../../common/vue-alert/vue-alert.store'
 import { InputText } from '../../common/vue-form'
-import { VueDivider } from '../../common/vue-layout'
 import VueButton from '../../common/VueButton.vue'
 
-const btnDisable = ref<boolean>(false)
+const router = useRouter()
 
 const formState = reactive({
   email: '',
@@ -28,79 +29,43 @@ const startSendEmail = async () => {
 </script>
 
 <template>
-  <div class="wrapper">
-    <div class="form-card pt-4 pb-10 px-4">
-      <VueDivider class="mt-4" border-width="1px">
-        <div class="mx-4 text-2xl font-medium">QUÊN MẬT KHẨU</div>
-      </VueDivider>
-      <form @submit.prevent="startSendEmail">
-        <div class="mt-4">
-          <div>Email</div>
-          <div>
-            <InputText v-model:value="formState.email" name="email" type="email" autocomplete="on"
-              required />
-          </div>
-        </div>
-        <div class="mt-4">
-          <div>Tài khoản</div>
-          <div>
-            <InputText v-model:value="formState.username" name="username" required />
-          </div>
-        </div>
-        <div class="flex justify-end mt-4">
-          <a @click="$router.push({ name: 'Login' })">Đăng nhập</a>
-        </div>
-        <div class="flex justify-center">
-          <VueButton color="blue" type="submit" :loading="loading" :disabled="btnDisable">
-            Gửi Email
-          </VueButton>
-        </div>
-      </form>
-    </div>
-    <div class="company-text">
-      <p>Công ty TNHH Công nghệ và TM MEDIHOME</p>
-      <p>
-        HOTLINE:
-        <a href="tel:0376899866" class="hotline">0376.899.866</a>
-      </p>
-    </div>
-  </div>
+  <section class="auth-panel">
+    <p class="panel-kicker">Khôi phục mật khẩu</p>
+    <h2>Quên mật khẩu?</h2>
+    <p class="panel-description">Nhập email và tài khoản để nhận hướng dẫn tạo mật khẩu mới.</p>
+
+    <form class="auth-form" @submit.prevent="startSendEmail">
+      <label class="field-label" for="forgot-email">Email</label>
+      <InputText
+        id="forgot-email"
+        v-model:value="formState.email"
+        name="email"
+        type="email"
+        placeholder="Nhập email"
+        autocomplete="on"
+        required
+      />
+
+      <label class="field-label" for="forgot-username">Tài khoản</label>
+      <InputText
+        id="forgot-username"
+        v-model:value="formState.username"
+        name="username"
+        placeholder="Nhập tài khoản"
+        required
+      />
+
+      <button class="auth-link" type="button" @click="router.push({ name: ROUTER_NAME.LOGIN })">
+        Quay lại đăng nhập
+      </button>
+
+      <VueButton class="submit-btn" color="blue" size="large" type="submit" :loading="loading">
+        Gửi email khôi phục
+      </VueButton>
+    </form>
+
+    <p class="panel-note">
+      Nếu chưa nhận được email, vui lòng kiểm tra spam hoặc thử lại sau vài phút.
+    </p>
+  </section>
 </template>
-
-<style lang="scss" scoped>
-.wrapper {
-  width: 100vw;
-  height: 100vh;
-  // background-image: url('@/assets/image/background-login.jpg');
-  background-position: center;
-  background-color: #3b6fba;
-  background-repeat: no-repeat;
-  background-size: cover;
-  padding-top: 10%;
-
-  .form-card {
-    max-width: 600px;
-    width: 90%;
-    margin: 0 auto;
-    border-radius: 10px;
-    box-shadow:
-      0px 3px 5px rgba(0, 0, 0, 0.02),
-      0px 0px 2px rgba(0, 0, 0, 0.05),
-      0px 1px 4px rgba(0, 0, 0, 0.08);
-    background-color: #fff;
-  }
-
-  .company-text {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    text-transform: uppercase;
-    font-weight: bold;
-    color: #fff;
-
-    .hotline {
-      color: #fff;
-    }
-  }
-}
-</style>

@@ -1,7 +1,7 @@
 export class FetchAPIBase {
   private timeout?: number
   private baseURL: string
-  private headers: Headers
+  private headers: Record<string, string>
 
   private interceptors: {
     request: ((requestInit: RequestInit) => Promise<any>)[]
@@ -9,14 +9,13 @@ export class FetchAPIBase {
     responseError: ((error: any) => Promise<any>)[]
   } = { request: [], response: [], responseError: [] }
 
-  constructor(input: { baseURL: string; timeout?: number }) {
+  init(input: { baseURL: string; timeout?: number }) {
     this.baseURL = input.baseURL
     this.timeout = input.timeout
-    this.headers = new Headers()
-    this.headers.set('Content-Type', 'application/json')
+    this.headers = { 'Content-Type': 'application/json' }
   }
 
-  setHeader(header: Headers) {
+  setHeader(header: Record<string, string>) {
     this.headers = header
   }
 
@@ -38,13 +37,16 @@ export class FetchAPIBase {
     url: string
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
     body?: Record<string, any>
-    params?: Record<string, any>
+    query?: Record<string, any>
     cache?: RequestCache
   }): Promise<any> {
     try {
       const fullURL = new URL(input.url, this.baseURL)
-      if (input.params) {
-        fullURL.search = new URLSearchParams(input.params).toString()
+      if (input.query) {
+        const queryCleaned = Object.fromEntries(
+          Object.entries(input.query ?? {}).filter(([, v]) => v !== undefined),
+        )
+        fullURL.search = new URLSearchParams(queryCleaned).toString()
       }
 
       let requestInit: RequestInit = {
@@ -79,28 +81,66 @@ export class FetchAPIBase {
     }
   }
 
-  async get(url: string, params?: Record<string, any>): Promise<any> {
-    const response = await this.request({ url, method: 'GET', params })
+  async get(
+    url: string,
+    options?: { query?: Record<string, any>; cache?: RequestCache },
+  ): Promise<any> {
+    const response = await this.request({
+      url,
+      method: 'GET',
+      query: options?.query,
+      cache: options?.cache,
+    })
     return response
   }
 
-  async post(url: string, body?: Record<string, any>): Promise<any> {
-    const response = await this.request({ url, method: 'POST', body })
+  async post(
+    url: string,
+    options?: { body?: Record<string, any>; query?: Record<string, any>; cache?: RequestCache },
+  ): Promise<any> {
+    const response = await this.request({
+      url,
+      method: 'POST',
+      body: options?.body,
+      query: options?.query,
+      cache: options?.cache,
+    })
     return response
   }
 
-  async put(url: string, body?: Record<string, any>): Promise<any> {
-    const response = await this.request({ url, method: 'PUT', body })
+  async put(
+    url: string,
+    options?: { body?: Record<string, any>; query?: Record<string, any>; cache?: RequestCache },
+  ): Promise<any> {
+    const response = await this.request({
+      url,
+      method: 'PUT',
+      body: options?.body,
+      query: options?.query,
+      cache: options?.cache,
+    })
     return response
   }
 
-  async patch(url: string, body?: Record<string, any>): Promise<any> {
-    const response = await this.request({ url, method: 'PATCH', body })
+  async patch(
+    url: string,
+    options?: { body?: Record<string, any>; query?: Record<string, any> },
+  ): Promise<any> {
+    const response = await this.request({
+      url,
+      method: 'PATCH',
+      body: options?.body,
+      query: options?.query,
+    })
     return response
   }
 
-  async delete(url: string, params?: Record<string, any>): Promise<any> {
-    const response = await this.request({ url, method: 'DELETE', params })
+  async delete(url: string, options?: { query?: Record<string, any> }): Promise<any> {
+    const response = await this.request({
+      url,
+      method: 'DELETE',
+      query: options?.query,
+    })
     return response
   }
 }

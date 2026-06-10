@@ -1,30 +1,3 @@
-<template>
-  <div ref="dropdownTriggerRef" class="dropdown-trigger">
-    <slot name="trigger"></slot>
-    <Teleport to="body">
-      <Transition :name="position.vertical === 'top' ? 'slide-up' : 'slide-down'">
-        <div
-          v-if="isOpen"
-          ref="dropdownContentRef"
-          class="dropdown-content"
-          :class="isClick ? 'dropdown-content-clicked' : ''"
-          :style="customStyle?.dropdownContent || ''"
-        >
-          <!-- Lỗi sinh ra 1 cái scroll mà chưa biết sửa thế nào -->
-          <!-- <div
-            v-if="customStyle?.arrow"
-            class="dropdown-arrow"
-            :style="customStyle?.dropdownArrow || ''"
-            :class="`arrow-${positionFix.vertical} arrow-${positionFix.horizontal}`"
-            ref="dropdownArrowRef"
-          ></div> --> 
-          <slot name="content"></slot>
-        </div>
-      </Transition>
-    </Teleport>
-  </div>
-</template>
-
 <script setup lang="ts">
 import {
   nextTick,
@@ -32,6 +5,7 @@ import {
   onMounted,
   reactive,
   ref,
+  watch,
   type PropType,
   type StyleValue,
 } from 'vue'
@@ -39,6 +13,8 @@ import {
 const dropdownTriggerRef = ref<HTMLElement | null>(null)
 const dropdownContentRef = ref<HTMLElement | null>(null)
 const dropdownArrowRef = ref<HTMLElement>(null as any)
+
+const emit = defineEmits<{ (e: 'update:isOpen', value: boolean): void }>()
 
 const props = defineProps({
   position: {
@@ -75,6 +51,13 @@ const positionFix = reactive<{
 const isOpen = ref(false)
 let isHover = false
 const isClick = ref(false)
+
+watch(
+  () => isOpen.value,
+  (newValue) => {
+    emit('update:isOpen', newValue)
+  },
+)
 
 const calculatePosition = () => {
   if (!dropdownTriggerRef.value || !dropdownContentRef.value || !isOpen.value) return
@@ -243,6 +226,33 @@ onBeforeUnmount(() => {
   }
 })
 </script>
+
+<template>
+  <div ref="dropdownTriggerRef" class="dropdown-trigger">
+    <slot name="trigger"></slot>
+    <Teleport to="body">
+      <Transition :name="position.vertical === 'top' ? 'slide-up' : 'slide-down'">
+        <div
+          v-if="isOpen"
+          ref="dropdownContentRef"
+          class="dropdown-content"
+          :class="isClick ? 'dropdown-content-clicked' : ''"
+          :style="customStyle?.dropdownContent || ''"
+        >
+          <!-- Lỗi sinh ra 1 cái scroll mà chưa biết sửa thế nào -->
+          <!-- <div
+            v-if="customStyle?.arrow"
+            class="dropdown-arrow"
+            :style="customStyle?.dropdownArrow || ''"
+            :class="`arrow-${positionFix.vertical} arrow-${positionFix.horizontal}`"
+            ref="dropdownArrowRef"
+          ></div> -->
+          <slot name="content"></slot>
+        </div>
+      </Transition>
+    </Teleport>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 .dropdown-trigger {

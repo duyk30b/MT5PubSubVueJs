@@ -17,6 +17,12 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: (state) => Boolean(state.user.id),
   },
   actions: {
+    async login(body: { username: string; password: string }) {
+      const loginData = await AuthApi.login(body)
+      this.user = loginData.user
+      LocalStorageCore.setToken(loginData)
+    },
+
     async initMeData() {
       try {
         if (

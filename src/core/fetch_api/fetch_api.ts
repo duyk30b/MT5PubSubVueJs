@@ -1,50 +1,43 @@
-import { LOCAL_STORAGE_KEYS } from '../local_storage/local_storage_keys'
 import { DeviceInformation } from './device_info'
 import { FetchAPIBase } from './fetch_api_base'
 
 const FetchApiSetup = {
-  baseURL: '',
-  logout: async () => {},
-  clientId: () => localStorage.getItem(LOCAL_STORAGE_KEYS.CLIENT_ID) || '',
-  getRefreshToken: () => localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN) || '',
-  getRefreshExp: () => Number(localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_EXP)) || 0,
-  getAccessToken: () => localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN) || '',
-  getAccessExp: () => Number(localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_EXP)) || 0,
-  removeAuth: async () => {
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCESS_EXP)
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN)
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.REFRESH_EXP)
-  },
+  clientId: () => '',
+  getAccessExp: () => 0,
+  getAccessToken: () => '',
+  getRefreshExp: () => 0,
+  getRefreshToken: () => '',
+  removeAuth: () => {},
+  setAccessToken: (data: any) => {},
   refreshToken: async () => {},
+  logout: async () => {},
   listenLoading: (loading: boolean) => {},
   listenPercent: (percent: number) => {},
   listenError: (error: any) => {},
   listenWarning: (error: any) => {},
 }
 
-const FetchApi = new FetchAPIBase({ baseURL: FetchApiSetup.baseURL, timeout: 10000 })
-const FetchApiWithoutAuth = new FetchAPIBase({ baseURL: FetchApiSetup.baseURL, timeout: 10000 })
+const FetchApi = new FetchAPIBase()
+const FetchApiBasic = new FetchAPIBase()
 
-const headers = new Headers()
-headers.set('Content-Type', 'application/json')
-headers.set('x-os', DeviceInformation.platform)
-headers.set('x-browser', DeviceInformation.browser)
-headers.set('x-mobile', String(DeviceInformation.mobile))
-headers.set('x-client-id', FetchApiSetup.clientId())
+const headers = {
+  'Content-Type': 'application/json',
+  'x-os': DeviceInformation.platform,
+  'x-browser': DeviceInformation.browser,
+  'x-mobile': String(DeviceInformation.mobile),
+  'x-client-id': FetchApiSetup.clientId(),
+}
 
-const headersWithoutAuth = new Headers(headers)
-
-FetchApi.setHeader(headers)
-FetchApiWithoutAuth.setHeader(headersWithoutAuth)
+FetchApiBasic.setHeader({ ...headers })
+FetchApi.setHeader({ ...headers })
 
 FetchApi.addRequestInterceptor(async (requestInit: RequestInit) => {
   if (!FetchApiSetup.getRefreshToken() || FetchApiSetup.getRefreshExp() - 60 * 1000 < Date.now()) {
-    await FetchApiSetup.removeAuth()
+    FetchApiSetup.removeAuth()
     throw new Error('Session expired. Please log in again.')
   }
   if (!FetchApiSetup.getAccessToken()) {
-    await FetchApiSetup.removeAuth()
+    FetchApiSetup.removeAuth()
     throw new Error('No access token. Please log in again.')
   }
   if (FetchApiSetup.getAccessExp() - 10 * 1000 < Date.now()) {
@@ -60,7 +53,7 @@ FetchApi.addRequestInterceptor(async (requestInit: RequestInit) => {
 FetchApi.addResponseInterceptor(async (requestInit: RequestInit, response: Response) => {
   FetchApiSetup.listenPercent(100)
   if (response.status === 401) {
-    await FetchApiSetup.removeAuth()
+    FetchApiSetup.removeAuth()
     throw new Error('Unauthorized. Please log in again.')
   }
   if (response.status === 403) {
@@ -69,7 +62,7 @@ FetchApi.addResponseInterceptor(async (requestInit: RequestInit, response: Respo
   if (response.status === 440) {
     await FetchApiSetup.refreshToken()
     if (!FetchApiSetup.getAccessToken()) {
-      await FetchApiSetup.removeAuth()
+      FetchApiSetup.removeAuth()
       throw new Error('Session expired. Please log in again.')
     }
     requestInit.headers!['Authorization'] = `Bearer ${FetchApiSetup.getAccessToken()}`
@@ -82,15 +75,18 @@ FetchApi.addResponseInterceptor(async (requestInit: RequestInit, response: Respo
   }
   if (response.status >= 400 && response.status < 500) {
     const errorText = await response.text()
-    throw new Error(`Client error! status: ${response.status}, message: ${errorText}`)
+    const errorData = errorText ? JSON.parse(errorText) : null
+    throw new Error(errorData?.message || `HTTP error! status: ${response.status}, message: ${errorText}`)
   }
   if (response.status >= 500) {
     const errorText = await response.text()
-    throw new Error(`Server error! status: ${response.status}, message: ${errorText}`)
+    const errorData = errorText ? JSON.parse(errorText) : null
+    throw new Error(errorData?.message || `Server error! status: ${response.status}, message: ${errorText}`)
   }
   if (!response.ok) {
     const errorText = await response.text()
-    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
+    const errorData = errorText ? JSON.parse(errorText) : null
+    throw new Error(errorData?.message || `HTTP error! status: ${response.status}, message: ${errorText}`)
   }
   setTimeout(() => {
     FetchApiSetup.listenLoading(false)
@@ -106,4 +102,4 @@ FetchApi.addErrorInterceptor(async (error: any) => {
   return error
 })
 
-export { FetchApi, FetchApiWithoutAuth, FetchApiSetup }
+export { FetchApi, FetchApiBasic, FetchApiSetup }
