@@ -23,5 +23,5 @@
   "js/ts.updateImportsOnFileMove.enabled": "always",
   "js/ts.inlayHints.parameterNames.enabled": "literals",
   "cSpell.language": "en,vi",
-  "cSpell.words": ["antd", "chartjs", "dexie", "MEDIAI", "Sider", "TNHH"]
+  "cSpell.words": ["antd", "chartjs", "dexie", "MEDIAI", "Sider", "TNHH", "topbar"]
 }

@@ -6,12 +6,12 @@ export const CONFIG = reactive({
   MODE: import.meta.env.MODE as 'development' | 'production' | 'test',
   API_BASE_URL:
     import.meta.env.MODE === 'production'
-      ? `https://api.mea.vn`
-      : `http://${location.hostname}:20000`,
+      ? `https://api_mt5.mediai.vn`
+      : `http://${location.hostname}:8000`,
   BUILD_TIME: '',
 })
 ;(window as any)._MEA_CONFIG = CONFIG
-// CONFIG.API_BASE_URL = 'https://api.mea.vn'
+// CONFIG.API_BASE_URL = 'https://api_mt5.mediai.vn'
 
 const loadConfig = async () => {
   try {

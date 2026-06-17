@@ -26,25 +26,37 @@ const handleClick = (e: Event) => {
 
 <style lang="scss" scoped>
 .tab-menu-item {
-  padding: 6px 12px;
+  padding: 8px 12px;
   cursor: pointer;
-  border: 1px solid #cdcdcd;
-  border-top: 5px solid #d6d6d6;
+  border: 1px solid var(--dashboard-line);
+  border-top: 4px solid color-mix(in srgb, var(--dashboard-line) 65%, transparent);
   margin-bottom: -1px;
   white-space: nowrap;
-  background-color: #f5f5f5;
+  background-color: color-mix(in srgb, var(--dashboard-panel) 84%, var(--dashboard-bg) 16%);
+  color: var(--dashboard-text-soft);
   opacity: 1;
   display: flex;
   align-items: center;
   gap: 5px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover {
+    color: var(--dashboard-primary-700);
+    border-color: color-mix(in srgb, var(--dashboard-primary-500) 42%, var(--dashboard-line));
+  }
 
   &.active {
-    border-top-color: #1890ff;
-    color: #1890ff;
+    border-top-color: var(--dashboard-primary-600);
+    color: var(--dashboard-primary-600);
     border-bottom: 0;
-    font-weight: 500;
+    font-weight: 700;
     opacity: 1;
-    background-color: white;
+    background-color: var(--dashboard-panel);
   }
 }
 </style>

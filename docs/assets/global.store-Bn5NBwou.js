@@ -1,1 +1,0 @@
-import{o as e}from"./vendor_node_modules-CpIDSEJf.js";const t=e("global",{state:()=>({isMobile:/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||window.innerWidth<=900,loading:!1,percent:0}),getters:{},actions:{}});export{t as u};

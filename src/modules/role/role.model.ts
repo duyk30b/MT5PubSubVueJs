@@ -12,13 +12,16 @@ export class Role extends BaseModel {
 
   userRoleList?: UserRole[]
 
-  static init(): Role {
+  static init(s?: Role): Role {
     const ins = new Role()
-    ins.id = 0
-    ins._localId = Math.random().toString(36).substring(2)
-
-    ins.permissionIds = JSON.stringify([])
-    ins.isActive = 1
+    ins._localId = String(s?._localId || Math.random().toString(36).substring(2))
+    ins.id = s?.id || 0
+    ins.roleCode = s?.roleCode || ''
+    ins.name = s?.name || ''
+    ins.permissionIds = s?.permissionIds || JSON.stringify([])
+    ins.isActive = s?.isActive || 1
+    ins.updatedAt = s?.updatedAt || Date.now()
+    ins.userRoleList = s?.userRoleList || []
     return ins
   }
 
@@ -28,15 +31,13 @@ export class Role extends BaseModel {
   }
 
   static basic(source: Role) {
-    const target = new Role()
-    Object.keys(target).forEach((key) => {
-      const value = target[key as keyof typeof target]
-      if (value === undefined) delete target[key as keyof typeof target]
-    })
-    Object.assign(target, source)
-    target._localId = String(
+    const cleaned = Object.fromEntries(
+      Object.entries(source ?? {}).filter(([, v]) => v !== undefined),
+    )
+    cleaned._localId = String(
       source.id || source._localId || Math.random().toString(36).substring(2),
     )
+    const target: Role = Object.assign(new Role(), cleaned)
     return target
   }
 

@@ -1,3 +1,4 @@
+import { BaseModel } from '../_base/base.model'
 import type { PermissionId } from './permission.enum'
 
 export enum PermissionStatus {
@@ -6,7 +7,7 @@ export enum PermissionStatus {
   PUBLIC = 1,
 }
 
-export class Permission {
+export class Permission extends BaseModel {
   id: PermissionId
   level: number
   code: keyof typeof PermissionId
@@ -19,12 +20,13 @@ export class Permission {
   children: Permission[]
 
   static basic(source: Permission) {
-    const target = new Permission()
-    Object.keys(target).forEach((key) => {
-      const value = target[key as keyof typeof target]
-      if (value === undefined) delete target[key as keyof typeof target]
-    })
-    Object.assign(target, source)
+    const cleaned = Object.fromEntries(
+      Object.entries(source ?? {}).filter(([, v]) => v !== undefined),
+    )
+    cleaned._localId = String(
+      source.id || source._localId || Math.random().toString(36).substring(2),
+    )
+    const target: Permission = Object.assign(new Permission(), cleaned)
     return target
   }
 

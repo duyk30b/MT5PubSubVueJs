@@ -14,6 +14,7 @@
     }"
     :position="{ horizontal: 'center', vertical: 'top' }"
     :delayHide="0"
+    @update:is-open="emit('update:isOpen', $event)"
   >
     <template #trigger>
       <slot name="trigger"></slot>
@@ -28,6 +29,8 @@
 
 <script lang="ts" setup>
 import Popover from './Popover.vue'
+
+const emit = defineEmits<{ (e: 'update:isOpen', value: boolean): void }>()
 
 const props = withDefaults(
   defineProps<{

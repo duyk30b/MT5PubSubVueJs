@@ -1,123 +1,173 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { LOCAL_STORAGE_KEYS } from '@/core/local_storage/local_storage_keys'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { CONFIG } from '../../config'
+import VueFooter from './VueFooter.vue'
 import VueHeader from './VueHeader.vue'
 import VueSider from './VueSider.vue'
-import { CONFIG } from '../../config'
-import { ESTimer } from '../../utils'
-import { VueSwitch } from '@/common/vue-form'
 
+const mobileBreakpoint = 992
+const isMobile = ref(window.innerWidth < mobileBreakpoint)
 const openSideDrawer = ref<boolean>(false)
 
-const firstCollapsed = localStorage.getItem('SIDE_COLLAPSED') === 'true' || window.innerWidth < 1400
-
-const defaultCollapsed = ref<boolean>(firstCollapsed)
+const firstCollapsed = localStorage.getItem('SIDE_COLLAPSED') === 'true'
 const collapsed = ref<boolean>(firstCollapsed)
-
-const modeDevelopment = ref(CONFIG.MODE === 'development')
-const handleChangeMode = (value: number | boolean) => {
-  if (value) {
-    CONFIG.MODE = 'development'
-  } else {
-    CONFIG.MODE = 'production'
-  }
-}
 
 const setSideCollapsed = (value: boolean) => {
   localStorage.setItem('SIDE_COLLAPSED', String(value))
   collapsed.value = value
 }
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth < mobileBreakpoint
+  if (!isMobile.value) {
+    openSideDrawer.value = false
+  }
+}
+
+const toggleSidebar = () => {
+  if (isMobile.value) {
+    openSideDrawer.value = !openSideDrawer.value
+    return
+  }
+  setSideCollapsed(!collapsed.value)
+}
+
+const closeMobileSidebar = () => {
+  openSideDrawer.value = false
+}
+
+onMounted(() => {
+  const savedTheme = localStorage.getItem(LOCAL_STORAGE_KEYS.THEME) === 'dark' ? 'dark' : 'light'
+  document.documentElement.classList.toggle('theme-dark', savedTheme === 'dark')
+  window.addEventListener('resize', handleResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <template>
-  <a-layout id="dashboard-layout">
-    <VueHeader @handleShowDrawer="(value) => (openSideDrawer = value)" />
-    <a-layout>
-      <a-layout-sider
-        theme="light"
-        :defaultCollapsed="defaultCollapsed"
-        collapsible
-        collapsedWidth="60"
-        width="240"
-        @collapse="setSideCollapsed"
-      >
-        <VueSider :collapsed="collapsed" />
-      </a-layout-sider>
-      <a-drawer
-        v-model:visible="openSideDrawer"
-        placement="left"
-        width="240"
-        :closable="false"
-        :bodyStyle="{ padding: 0 }"
-        :drawerStyle="{ backgroundColor: '#fff' }"
-      >
-        <VueSider :collapsed="collapsed" @handleShowDrawer="openSideDrawer = $event" />
-      </a-drawer>
-      <a-layout>
-        <a-layout-content>
-          <slot></slot>
-        </a-layout-content>
-        <a-layout-footer>
-          <div>
-            <span v-if="CONFIG.MODE === 'development'" style="color: violet; font-weight: bold">
-              {{ CONFIG.API_BASE_URL }}
-            </span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span style="color: #333">
-              <strong>QuanTechCapital-v1.0</strong>
-              <span>©{{ ESTimer.timeToText(CONFIG.BUILD_TIME, 'DD/MM/YY-hh:mm:ss', 7) }}</span>
-              <span>
-                - Hotline:
-                <b>0988.456.789</b>
-              </span>
-            </span>
-            <VueSwitch
-              checkedColor="violet"
-              :size="'14px'"
-              v-model:modelValue="modeDevelopment"
-              @change="handleChangeMode"
-            />
-          </div>
-        </a-layout-footer>
-      </a-layout>
-    </a-layout>
-  </a-layout>
+  <div id="dashboard-layout" :class="{ 'is-mobile': isMobile }">
+    <div v-if="isMobile && openSideDrawer" class="dashboard-overlay" @click="closeMobileSidebar" />
+
+    <aside
+      class="dashboard-sider"
+      :class="{
+        'collapsed': collapsed && !isMobile,
+        'mobile-open': isMobile && openSideDrawer,
+      }"
+    >
+      <VueSider :collapsed="collapsed && !isMobile" @closeMobile="closeMobileSidebar" />
+    </aside>
+
+    <section class="dashboard-main">
+      <header class="dashboard-header">
+        <VueHeader :isMobile="isMobile" @toggleSidebar="toggleSidebar" />
+      </header>
+
+      <!-- <div v-if="CONFIG.MODE === 'development'" class="dashboard-dev-mode">
+        <span class="label">DEV API:</span>
+        <span>{{ CONFIG.API_BASE_URL }}</span>
+      </div> -->
+
+      <main class="dashboard-content">
+        <slot />
+      </main>
+
+      <VueFooter />
+    </section>
+  </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #dashboard-layout {
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  background: var(--dashboard-bg);
+  overflow: hidden;
+}
 
-  .ant-layout-sider {
-    @media screen and (max-width: 768px) {
-      display: none;
-    }
+.dashboard-header {
+  flex-shrink: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--dashboard-line);
+}
+
+.dashboard-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--dashboard-overlay);
+  backdrop-filter: blur(1px);
+  z-index: 70;
+}
+
+.dashboard-sider {
+  width: 268px;
+  height: 100vh;
+  flex-shrink: 0;
+  border-right: 1px solid var(--dashboard-line);
+  background: var(--dashboard-sider-bg);
+  transition:
+    width 0.25s ease,
+    transform 0.25s ease;
+  overflow: hidden;
+}
+
+.dashboard-sider.collapsed {
+  width: 76px;
+}
+
+.dashboard-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-dev-mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--dashboard-primary-700);
+  background: #dbeafe;
+  border-bottom: 1px solid #bfdbfe;
+
+  .label {
+    font-weight: 700;
+  }
+}
+
+.dashboard-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+}
+
+@media (max-width: 991px) {
+  .dashboard-sider {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 276px;
+    transform: translateX(-100%);
+    z-index: 80;
+    border-right: none;
+    box-shadow: 0 20px 45px var(--dashboard-shadow);
   }
 
-  .ant-layout-content {
-    display: flex;
-    flex-direction: column;
+  .dashboard-sider.mobile-open {
+    transform: translateX(0);
   }
 
-  .ant-layout-footer {
-    margin-top: 12px;
+  .dashboard-content {
     padding: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    background-color: white;
-  }
-
-  .ant-layout {
-    background-color: var(--color-body-bg);
-  }
-
-  .ant-layout-sider-trigger {
-    background-color: #3b70ba15 !important;
-  }
-  .ant-pagination-options {
-    display: inline-block !important;
   }
 }
 </style>

@@ -11,8 +11,11 @@ import './assets/tailwind.css'
 import './assets/main.scss'
 // then import common scss
 import './common/_scss/vue-common.scss'
+import { setupContainer } from './setup_container.ts'
 
 const start = async () => {
+  setupContainer()
+
   const app = createApp(App)
 
   IndexedDBConnection.init()
@@ -21,7 +24,6 @@ const start = async () => {
   app.use(Router)
 
   app.mount('#app')
-  SocketBase.connect()
 }
 
 start()

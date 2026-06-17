@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { ref, watch, watchEffect } from 'vue'
+import { onMounted, ref, watch, watchEffect } from 'vue'
 import { ESNumber } from '../../utils'
 import { IconSortDown, IconSortUp } from '../icon-font-awesome'
 
@@ -266,12 +265,25 @@ input {
   align-items: center;
   cursor: pointer;
   width: 2em;
+  color: var(--control-text);
+  background: color-mix(in srgb, var(--control-muted-bg) 75%, var(--control-bg) 25%);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+
   & > svg {
     width: 1.2em;
     height: 1.2em;
   }
+
+  &:hover:not(:disabled) {
+    background: var(--control-bg-hover);
+    color: var(--dashboard-primary-600);
+  }
+
   &:active {
-    border-left: 1px solid #40a9ff;
+    border-left: 1px solid var(--control-border-hover);
     & > svg {
       width: 1.4em;
       height: 1.4em;
@@ -296,9 +308,9 @@ input {
   }
 }
 .button-minus {
-  border-right: 1px solid #cdcdcd;
+  border-right: 1px solid var(--control-border);
 }
 .button-plus {
-  border-left: 1px solid #cdcdcd;
+  border-left: 1px solid var(--control-border);
 }
 </style>

@@ -1,4 +1,5 @@
-import { createRouter, createWebHistory, type RouteLocationNormalizedLoaded } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory, type RouteLocationNormalizedLoaded } from 'vue-router'
+import { ROUTER_NAME } from './router_name.ts'
 
 enum AuthLevel {
   GUEST = 'GUEST',
@@ -7,44 +8,44 @@ enum AuthLevel {
 }
 
 const Router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'AppContainer',
+      name: ROUTER_NAME.APP_CONTAINER,
       component: () => import('../views/AppContainer.vue'),
       meta: { auth: AuthLevel.USER },
       children: [
         {
           path: '',
-          name: 'AppHome',
+          name: ROUTER_NAME.HOME,
           component: () => import('../views/AppHome.vue'),
           meta: { title: 'Trang chủ' },
         },
         {
           path: 'user',
-          name: 'User',
+          name: ROUTER_NAME.USER,
           children: [
             {
               path: 'account',
               meta: { title: 'Tài khoản' },
-              name: 'Account',
+              name: ROUTER_NAME.ACCOUNT,
               component: () => import('../views/user/account/AccountList.vue'),
             },
             {
               path: 'role',
-              name: 'Role',
+              name: ROUTER_NAME.ROLE,
               meta: { title: 'Vai trò' },
-              redirect: () => ({ name: 'RoleList' }),
+              redirect: () => ({ name: ROUTER_NAME.ROLE_LIST }),
               children: [
                 {
                   path: 'list',
-                  name: 'RoleList',
+                  name: ROUTER_NAME.ROLE_LIST,
                   component: () => import('../views/user/role/RoleList.vue'),
                 },
                 {
                   path: 'upsert/:id?',
-                  name: 'RoleUpsert',
+                  name: ROUTER_NAME.ROLE_UPSERT,
                   component: () => import('../views/user/role/upsert/RoleUpsertContainer.vue'),
                   meta: {
                     title: (route: RouteLocationNormalizedLoaded) => {
@@ -57,6 +58,31 @@ const Router = createRouter({
             },
           ],
         },
+        {
+          path: 'mt5-program',
+          name: ROUTER_NAME.MT5_PROGRAM,
+          meta: { title: 'MT5 Program' },
+          children: [
+            {
+              path: 'list',
+              name: ROUTER_NAME.MT5_PROGRAM_LIST,
+              component: () => import('../views/mt5_program/MT5ProgramList.vue'),
+            },
+          ],
+        },
+        {
+          path: 'systems',
+          name: ROUTER_NAME.SYSTEMS,
+          meta: { title: 'Hệ thống' },
+          children: [
+            {
+              path: 'system-setting',
+              name: ROUTER_NAME.SYSTEM_SETTING,
+              component: () => import('../views/systems/system-setting/SystemSetting.vue'),
+              meta: { title: 'Cài đặt' },
+            },
+          ],
+        },
       ],
     },
     {
@@ -66,17 +92,17 @@ const Router = createRouter({
       children: [
         {
           path: 'login',
-          name: 'Login',
+          name: ROUTER_NAME.LOGIN,
           component: () => import('../views/auth/Login.vue'),
         },
         {
           path: 'forgot-password',
-          name: 'ForgotPassword',
+          name: ROUTER_NAME.FORGOT_PASSWORD,
           component: () => import('../views/auth/ForgotPassword.vue'),
         },
         {
           path: 'reset-password',
-          name: 'ResetPassword',
+          name: ROUTER_NAME.RESET_PASSWORD,
           component: () => import('../views/auth/ResetPassword.vue'),
         },
       ],

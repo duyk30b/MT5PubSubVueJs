@@ -1,37 +1,31 @@
 import { FetchApi } from '@/core/fetch_api'
-import type { FullResponse } from '../_base/base-dto'
 import { UserDetailQuery, UserGetQuery, UserListQuery, UserPaginationQuery } from './user.dto'
 import { User } from './user.model'
 
 export class UserApi {
   static async pagination(options: UserPaginationQuery) {
-    const params = UserGetQuery.toQuery(options)
-
-    const response = await FetchApi.get('/user/pagination', { params })
-    const { data, meta } = response.data as FullResponse
-
+    const query = UserGetQuery.toQuery(options)
+    const response = await FetchApi.get('/user/pagination', { query })
     return {
-      userList: User.fromList(data.userList),
-      total: data.total,
-      page: data.page,
-      limit: data.limit,
+      userList: User.fromList(response.userList),
+      total: response.total,
+      page: response.page,
+      limit: response.limit,
     }
   }
 
   static async list(options: UserListQuery): Promise<User[]> {
-    const params = UserGetQuery.toQuery(options)
+    const query = UserGetQuery.toQuery(options)
 
-    const response = await FetchApi.get('/user/list', { params })
-    const { data } = response.data as FullResponse
-    return User.fromList(data)
+    const response = await FetchApi.get('/user/list', { query })
+    return User.fromList(response.userList)
   }
 
   static async detail(id: number, options?: UserDetailQuery): Promise<User> {
-    const params = UserGetQuery.toQuery(options || {})
+    const query = UserGetQuery.toQuery(options || {})
 
-    const response = await FetchApi.get(`/user/detail/${id}`, { params })
-    const { data } = response.data as FullResponse<{ user: any }>
-    return User.from(data.user)
+    const response = await FetchApi.get(`/user/detail/${id}`, { query })
+    return User.from(response.user)
   }
 
   static async createOne(body: {
@@ -41,18 +35,19 @@ export class UserApi {
   }) {
     const { user, account, roleIdList } = body
     const response = await FetchApi.post('/user/create', {
-      user: {
-        phone: user.phone,
-        fullName: user.fullName,
-        birthday: user.birthday,
-        gender: user.gender,
-        isActive: user.isActive,
+      body: {
+        user: {
+          phone: user.phone,
+          fullName: user.fullName,
+          birthday: user.birthday,
+          gender: user.gender,
+          isActive: user.isActive,
+        },
+        account,
+        roleIdList,
       },
-      account,
-      roleIdList,
     })
-    const { data } = response.data as FullResponse<{ user: any }>
-    return User.from(data.user)
+    return User.from(response.user)
   }
 
   static async updateOne(
@@ -66,30 +61,29 @@ export class UserApi {
   ) {
     const { user, account, roleIdList, roomIdList } = body
     const response = await FetchApi.post(`/user/update/${id}`, {
-      user: {
-        phone: user.phone,
-        fullName: user.fullName,
-        birthday: user.birthday,
-        gender: user.gender,
-        isActive: user.isActive,
+      body: {
+        user: {
+          phone: user.phone,
+          fullName: user.fullName,
+          birthday: user.birthday,
+          gender: user.gender,
+          isActive: user.isActive,
+        },
+        account,
+        roomIdList,
+        roleIdList,
       },
-      account,
-      roomIdList,
-      roleIdList,
     })
-    const { data } = response.data as FullResponse<{ user: any }>
-    return User.from(data.user)
+    return User.from(response.user)
   }
 
   static async deleteOne(id: number) {
-    const response = await FetchApi.post(`/user/delete/${id}`)
-    const { data } = response.data as FullResponse<{ userId: number }>
-    return data
+    const response = await FetchApi.post(`/user/delete/${id}`, { body: {} })
+    return response.userId as number
   }
 
   static async deviceLogout(userId: number, clientId: string) {
-    const response = await FetchApi.post(`/user/device-logout/${userId}`, { clientId })
-    const { data } = response.data as FullResponse
-    return data
+    const response = await FetchApi.post(`/user/device-logout/${userId}`, { body: { clientId } })
+    return response
   }
 }

@@ -77,96 +77,72 @@ const props = withDefaults(
 .vue-tag {
   position: relative;
   display: inline-block;
-  padding: 0 6px;
+  padding: 0 8px;
   outline: 0;
   white-space: nowrap;
-  border: 1px solid #cdcdcd;
-  border-radius: 2px;
-  background-color: white;
-  line-height: 22px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background-color: var(--control-bg);
+  color: var(--control-text);
+  line-height: 24px;
 
   div {
     display: flex;
-    gap: 0.5em; // để những icon bên trong được cách xa ra 1 chút
+    gap: 0.45em;
     justify-content: center;
     align-items: center;
     font-size: 12px;
     span {
       line-height: 0;
-      // &.icon-check {
-      //   svg {
-      //     shape-rendering: optimizespeed; // bật thì đậm hơn
-      //   }
-      // }
-      // &.icon-minus {
-      //   svg {
-      //     shape-rendering: optimizespeed; // tắt thì đậm hơn, thế mới hay
-      //   }
-      // }
-      // &.icon-print {
-      //   svg {
-      //     shape-rendering: optimizespeed; // bật màu sáng hơn nhưng thanh mảnh hơn
-      //   }
-      // }
-      // &.icon-save {
-      //   svg {
-      //     shape-rendering: optimizespeed; // bật màu sáng hơn nhưng thanh mảnh hơn
-      //   }
-      // }
-      // &.icon-trash {
-      //   svg {
-      //     shape-rendering: optimizespeed; // thanh mảnh trông rất xấu
-      //   }
-      // }
     }
   }
 
   &.vue-tag-green {
-    color: #52c41a;
-    background-color: #f6ffed;
-    border-color: #b7eb8f;
+    color: #2f855a;
+    background-color: #edfdf3;
+    border-color: #9fe4b5;
   }
 
   &.vue-tag-blue {
-    color: #1890ff;
-    background-color: #e6f7ff;
-    border-color: #91d5ff;
+    color: #1d4f9c;
+    background-color: #eaf3ff;
+    border-color: #9fc4f7;
   }
 
   &.vue-tag-cyan {
-    color: #08979c;
-    background-color: #e6fffb;
-    border-color: #87e8de;
+    color: #0f7a82;
+    background-color: #e8fbfc;
+    border-color: #93dde2;
   }
 
   &.vue-tag-orange {
-    color: #faad14;
-    background-color: #fffbe6;
-    border-color: #ffe58f;
+    color: #b45309;
+    background-color: #fff8e8;
+    border-color: #f6d092;
   }
 
   &.vue-tag-red {
-    color: #ff4d4f;
-    background-color: #fff1f0;
-    border-color: #ffa39e;
+    color: #c53030;
+    background-color: #fff1f2;
+    border-color: #f9b3b8;
   }
 
   &.vue-tag-purple {
-    color: #531dab;
-    background-color: #f9f0ff;
-    border-color: #d3adf7;
+    color: #6b46c1;
+    background-color: #f6f0ff;
+    border-color: #d9c2fb;
   }
 
   &.vue-tag-size-text {
     padding: 0 8px;
     border: none;
-    color: #1890ff;
+    color: var(--dashboard-primary-600);
     background-color: inherit !important;
 
     &.vue-tag-blue {
-      color: #1890ff;
+      color: var(--dashboard-primary-600);
       &:hover {
-        color: #40a9ff;
+        color: var(--dashboard-primary-700);
       }
     }
   }
@@ -177,8 +153,47 @@ const props = withDefaults(
   }
 
   &.vue-tag-size-large {
-    padding: 8px 24px;
+    padding: 4px 14px;
     font-size: 16px;
+    line-height: 30px;
+  }
+}
+
+html.theme-dark .vue-tag {
+  &.vue-tag-green {
+    color: #9de7b5;
+    background-color: rgba(46, 143, 84, 0.2);
+    border-color: rgba(46, 143, 84, 0.45);
+  }
+
+  &.vue-tag-blue {
+    color: #b9d4ff;
+    background-color: rgba(30, 102, 195, 0.22);
+    border-color: rgba(110, 164, 239, 0.52);
+  }
+
+  &.vue-tag-cyan {
+    color: #a5eef2;
+    background-color: rgba(15, 142, 155, 0.24);
+    border-color: rgba(83, 190, 199, 0.5);
+  }
+
+  &.vue-tag-orange {
+    color: #ffd39b;
+    background-color: rgba(180, 83, 9, 0.23);
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+
+  &.vue-tag-red {
+    color: #fecaca;
+    background-color: rgba(197, 48, 48, 0.22);
+    border-color: rgba(248, 113, 113, 0.5);
+  }
+
+  &.vue-tag-purple {
+    color: #e1d3ff;
+    background-color: rgba(107, 70, 193, 0.24);
+    border-color: rgba(167, 139, 250, 0.5);
   }
 }
 </style>

@@ -5,29 +5,28 @@ import { Role } from './role.model'
 
 export class RoleApi {
   static async pagination(options: RolePaginationQuery) {
-    const params = RoleGetQuery.toQuery(options)
+    const query = RoleGetQuery.toQuery(options)
 
-    const response = await FetchApi.get('/role/pagination', { params })
-    const { data, meta } = response as FullResponse
+    const response = await FetchApi.get('/role/pagination', { query })
     return {
-      roleList: Role.fromList(data.roleList),
-      total: data.total,
-      page: data.page,
-      limit: data.limit,
+      roleList: Role.fromList(response.roleList),
+      total: response.total,
+      page: response.page,
+      limit: response.limit,
     }
   }
 
   static async list(options: RoleListQuery): Promise<Role[]> {
-    const params = RoleGetQuery.toQuery(options)
+    const query = RoleGetQuery.toQuery(options)
 
-    const response = await FetchApi.get('/role/list', { params })
+    const response = await FetchApi.get('/role/list', { query })
     const { data } = response as FullResponse
     return Role.fromList(data)
   }
 
   static async detail(id: number, options: RoleDetailQuery): Promise<Role> {
-    const params = RoleGetQuery.toQuery(options)
-    const response = await FetchApi.get(`/role/detail/${id}`, { params })
+    const query = RoleGetQuery.toQuery(options)
+    const response = await FetchApi.get(`/role/detail/${id}`, { query })
     const { data } = response as FullResponse<{ role: any }>
 
     return Role.from(data.role)
@@ -35,12 +34,14 @@ export class RoleApi {
 
   static async createOne(role: Role, userIdList: number[]) {
     const response = await FetchApi.post('/role/create', {
-      name: role.name,
-      roleCode: role.roleCode || '',
-      permissionIds: role.permissionIds,
-      isActive: role.isActive,
+      body: {
+        name: role.name,
+        roleCode: role.roleCode || '',
+        permissionIds: role.permissionIds,
+        isActive: role.isActive,
 
-      userIdList,
+        userIdList,
+      },
     })
     const { data } = response as FullResponse<{ role: any }>
 
@@ -49,12 +50,14 @@ export class RoleApi {
 
   static async updateOne(id: number, role: Role, userIdList: number[]) {
     const response = await FetchApi.post(`/role/update/${id}`, {
-      name: role.name,
-      roleCode: role.roleCode || '',
-      permissionIds: role.permissionIds,
-      isActive: role.isActive,
+      body: {
+        name: role.name,
+        roleCode: role.roleCode || '',
+        permissionIds: role.permissionIds,
+        isActive: role.isActive,
 
-      userIdList,
+        userIdList,
+      },
     })
     const { data } = response as FullResponse<{ role: any }>
 

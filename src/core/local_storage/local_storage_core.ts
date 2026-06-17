@@ -27,19 +27,19 @@ export class LocalStorageCore {
   }
 
   static getAccessToken() {
-    return localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN)
+    return localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN) || ''
   }
 
   static getAccessExp() {
-    return Number(localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_EXP))
+    return Number(localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_EXP) || 0)
   }
 
   static getRefreshToken() {
-    return localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN)
+    return localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN) || ''
   }
 
   static getRefreshExp() {
-    return Number(localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_EXP))
+    return Number(localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_EXP) || 0)
   }
 
   static setItem(key: string, value: string) {

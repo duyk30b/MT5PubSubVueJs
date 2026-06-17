@@ -1,3 +1,4 @@
+import { BaseModel } from '../_base/base.model'
 import { Role } from '../role/role.model'
 import { UserRole } from '../user-role/user-role.model'
 import Device from './device.model'
@@ -8,8 +9,7 @@ export enum UserType {
   User = 2,
 }
 
-export class User {
-  oid: number
+export class User extends BaseModel {
   id: number
   username: string
   password: string
@@ -24,17 +24,35 @@ export class User {
   userType: UserType
   isActive: 1 | 0 // Trạng thái
 
-  updatedAt: number
-  deletedAt: number
+  updatedAt?: number
+  deletedAt?: number
 
   userRoleList?: UserRole[]
   devices?: Device[]
 
-  static init(): User {
+  static init(s?: User): User {
     const ins = new User()
-    ins.id = 0
-    ins.isActive = 1
-    ins.userType = UserType.User
+    ins._localId = String(s?.id || Math.random().toString(36).substring(2))
+    ins.id = s?.id || 0
+    ins.username = s?.username || ''
+    ins.password = s?.password || ''
+    ins.secret = s?.secret || ''
+
+    ins.fullName = s?.fullName || ''
+    ins.phone = s?.phone || ''
+    ins.birthday = s?.birthday
+    ins.gender = s?.gender
+
+    ins.imageIds = s?.imageIds || ''
+    ins.userType = s?.userType || UserType.User
+    ins.isActive = s?.isActive || 1
+
+    ins.updatedAt = s?.updatedAt
+    ins.deletedAt = s?.deletedAt
+
+    ins.userRoleList = s?.userRoleList || []
+    ins.devices = s?.devices || []
+
     return ins
   }
 
@@ -44,19 +62,13 @@ export class User {
   }
 
   static basic(source: User) {
-    const target = new User()
-    Object.keys(target).forEach((key) => {
-      const value = target[key as keyof typeof target]
-      if (value === undefined) delete target[key as keyof typeof target]
-    })
-    Object.assign(target, source)
-    if (target.secret && !target.password) {
-      try {
-        // target.password = decrypt(target.secret, target.username)
-      } catch (error) {
-        console.log('🚀 ~ file: user.model.ts:117 ~ User ~ basic ~ error:', error)
-      }
-    }
+    const cleaned = Object.fromEntries(
+      Object.entries(source ?? {}).filter(([, v]) => v !== undefined),
+    )
+    cleaned._localId = String(
+      source.id || source._localId || Math.random().toString(36).substring(2),
+    )
+    const target: User = Object.assign(new User(), cleaned)
     return target
   }
 
@@ -66,15 +78,15 @@ export class User {
 
   static from(source: User) {
     const target = User.basic(source)
-    if (target.userRoleList) {
-      target.userRoleList = UserRole.basicList(target.userRoleList)
+    if (source.userRoleList) {
+      target.userRoleList = UserRole.basicList(source.userRoleList)
       target.userRoleList.forEach((userRole) => {
         userRole.role = userRole.role ? Role.basic(userRole.role) : userRole.role
         // userRole.user = userRole.user ? User.basic(userRole.user) : userRole.user
       })
     }
-    if (target.devices) {
-      target.devices = Device.basicList(target.devices)
+    if (source.devices) {
+      target.devices = Device.basicList(source.devices)
     }
     return target
   }

@@ -1,17 +1,35 @@
 import io, { Socket } from 'socket.io-client'
-import { CONFIG } from '../../config'
 import { SocketService } from './socket.service'
 import { SOCKET_EVENT } from './socket.variable'
-import { LOCAL_STORAGE_KEYS } from '../local_storage/local_storage_keys'
 
 export class SocketBase {
+  static token: string = ''
+  static baseURL: string = ''
   static socket: Socket
+  static timeout: number = 10000
+  static mode: 'development' | 'production' | 'test' = 'production'
+
+  static init(options: {
+    baseURL: string
+    token: string
+    timeout?: number
+    mode?: 'development' | 'production' | 'test'
+  }) {
+    SocketBase.token = options.token
+    SocketBase.baseURL = options.baseURL
+    if (options.timeout) {
+      SocketBase.timeout = options.timeout
+    }
+    if (options.mode) {
+      SocketBase.mode = options.mode
+    }
+  }
 
   static connect() {
-    SocketBase.socket = io(CONFIG.API_BASE_URL, {
+    SocketBase.socket = io(SocketBase.baseURL, {
       transports: ['websocket'],
-      auth: { token: localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN) },
-      timeout: 10000,
+      auth: { token: SocketBase.token },
+      timeout: SocketBase.timeout,
     })
 
     SocketBase.socket.on('connect', () => {
@@ -25,14 +43,22 @@ export class SocketBase {
       console.error('Socket connect_error:', err.message)
     })
 
-    if (CONFIG.MODE === 'development') {
+    if (SocketBase.mode === 'development') {
       SocketBase.socket.onAny((event, ...args) => {
-        console.log(`Socket listen event: ${event}`, args)
+        // console.log(`Socket listen event: ${event}`, args)
       })
     }
 
     SocketBase.socket.on(SOCKET_EVENT.SERVER_EMIT_DEMO, (data) => {
       SocketService.listenServerEmitDemo(data)
+    })
+
+    SocketBase.socket.on(SOCKET_EVENT.MASTER_DATA_CHANGE, (data) => {
+      SocketService.masterDataChange(data)
+    })
+
+    SocketBase.socket.on(SOCKET_EVENT.SOCKET_MT5_PROGRAM_INFO, (data) => {
+      SocketService.listenMt5ProgramInfo(data)
     })
   }
 
@@ -42,11 +68,11 @@ export class SocketBase {
     }
   }
 
-  static reconnect() {
+  static reconnect(options: { token: string }) {
     if (SocketBase.socket) {
       SocketBase.socket.disconnect()
-      SocketBase.socket.auth = { token: localStorage.getItem(LOCAL_STORAGE_KEYS.REFRESH_TOKEN) }
-      SocketBase.connect()
     }
+    SocketBase.token = options.token
+    SocketBase.connect()
   }
 }

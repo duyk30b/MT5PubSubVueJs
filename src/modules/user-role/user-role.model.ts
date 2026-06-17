@@ -1,8 +1,8 @@
+import { BaseModel } from '../_base/base.model'
 import { Role } from '../role/role.model'
 import { User } from '../user/user.model'
 
-export class UserRole {
-  oid: number
+export class UserRole extends BaseModel {
   id: number | null
 
   userId: number
@@ -11,9 +11,16 @@ export class UserRole {
   role?: Role
   user?: User
 
-  static init(): UserRole {
+  static init(s?: UserRole): UserRole {
     const ins = new UserRole()
-    ins.id = 0
+    ins._localId = String(s?.id || Math.random().toString(36).substring(2))
+
+    ins.id = s?.id || 0
+    ins.userId = s?.userId || 0
+    ins.roleId = s?.roleId || 0
+
+    ins.role = s?.role
+    ins.user = s?.user
     return ins
   }
 
@@ -23,12 +30,13 @@ export class UserRole {
   }
 
   static basic(source: UserRole) {
-    const target = new UserRole()
-    Object.keys(target).forEach((key) => {
-      const value = target[key as keyof typeof target]
-      if (value === undefined) delete target[key as keyof typeof target]
-    })
-    Object.assign(target, source)
+    const cleaned = Object.fromEntries(
+      Object.entries(source ?? {}).filter(([, v]) => v !== undefined),
+    )
+    cleaned._localId = String(
+      source.id || source._localId || Math.random().toString(36).substring(2),
+    )
+    const target: UserRole = Object.assign(new UserRole(), cleaned)
     return target
   }
 
@@ -38,13 +46,12 @@ export class UserRole {
 
   static from(source: UserRole) {
     const target = UserRole.basic(source)
-    if (Object.prototype.hasOwnProperty.call(source, 'user')) {
-      target.user = target.user ? User.basic(target.user) : target.user
+    if (source.user) {
+      target.user = User.basic(source.user)
     }
-    if (Object.prototype.hasOwnProperty.call(source, 'role')) {
-      target.role = target.role ? Role.basic(target.role) : target.role
+    if (source.role) {
+      target.role = Role.basic(source.role)
     }
-
     return target
   }
 

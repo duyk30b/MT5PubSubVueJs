@@ -1,1 +1,0 @@
-import{n as t,g as a,d as s,x as o}from"./vendor_node_modules-CpIDSEJf.js";const n={class:"mt-2"},l=t({__name:"AppHome",setup(r){return(p,e)=>(o(),a("div",n,[...e[0]||(e[0]=[s("div",{class:""},[s("div",{class:"flex flex-wrap justify-between"})],-1)])]))}});export{l as default};

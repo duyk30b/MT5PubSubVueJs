@@ -5,9 +5,9 @@ import { Permission } from './permission.model'
 
 export class PermissionApi {
   static async list(options: PermissionListQuery): Promise<Permission[]> {
-    const params = PermissionGetQuery.toQuery(options)
+    const query = PermissionGetQuery.toQuery(options)
 
-    const response = await FetchApi.get('/permission/list', { params })
+    const response = await FetchApi.get('/permission/list', { query })
     const { data } = response.data as FullResponse
     return Permission.fromList(data)
   }
