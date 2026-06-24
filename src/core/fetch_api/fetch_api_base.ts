@@ -15,8 +15,8 @@ export class FetchAPIBase {
     this.headers = { 'Content-Type': 'application/json' }
   }
 
-  setHeader(header: Record<string, string>) {
-    this.headers = header
+  setHeader(headers: Record<string, string>) {
+    this.headers = headers
   }
 
   addRequestInterceptor(interceptor: (requestInit: RequestInit) => Promise<any>) {

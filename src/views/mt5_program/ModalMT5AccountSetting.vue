@@ -8,8 +8,9 @@ import {
   type InputSelectOption
 } from '@/common/vue-form'
 import VueModal from '@/common/vue-modal/VueModal.vue'
-import { Mt5Account, Mt5AccountApi, Mt5AccountType } from '@/modules/mt5_account'
+import { Mt5Account, Mt5AccountApi, Mt5AccountRole, Mt5AccountType } from '@/modules/mt5_account'
 import { useMt5ProgramStore } from '@/stores/mt5_program.store'
+import { ESTypescript } from '@/utils'
 import { computed, ref } from 'vue'
 
 const emit = defineEmits<{
@@ -21,13 +22,16 @@ const mt5ProgramStore = useMt5ProgramStore()
 const mt5AccountOrigin = ref(Mt5Account.blank())
 const mt5Account = ref(Mt5Account.blank())
 const showModal = ref(false)
-const programName = ref('')
 
-const accountTypeOptions: InputSelectOption<any>[] = [
-  { label: 'Normal', value: 0 },
-  { label: 'Master', value: 1 },
-  { label: 'Follower', value: 2 },
-]
+const accountRoleOptions: InputSelectOption<any>[] = ESTypescript.valuesEnum(Mt5AccountRole).map((value) => ({
+  value,
+  label: Mt5AccountRole[value],
+}))
+
+const accountTypeOptions: InputSelectOption<any>[] = ESTypescript.valuesEnum(Mt5AccountType).map((value) => ({
+  value,
+  label: Mt5AccountType[value],
+}))
 
 const copyMasterLoginOptions = computed(() => {
   return mt5ProgramStore.mt5ProgramInfoList
@@ -35,7 +39,7 @@ const copyMasterLoginOptions = computed(() => {
       (program) =>
         program?.mt5_account?.accountLogin &&
         program.mt5_account.accountLogin !== mt5Account.value.accountLogin &&
-        program?.mt5_account?.accountType === Mt5AccountType.MASTER,
+        program?.mt5_account?.accountRole === Mt5AccountRole.Master,
     )
     .map((program) => ({
       label: `${program.data.account_info.login} - ${program.data.account_info.name}`,
@@ -51,7 +55,6 @@ const disabledButtonSave = computed(() => {
 const openModal = async (props: { accountLogin: number; programName: string }) => {
   const { accountLogin } = props
   showModal.value = true
-  programName.value = props.programName
 
   mt5AccountOrigin.value = await Mt5AccountApi.getOne({ filter: { accountLogin } })
   if (!mt5AccountOrigin.value.id) {
@@ -65,6 +68,7 @@ const openModal = async (props: { accountLogin: number; programName: string }) =
     }
   }
   mt5Account.value = Mt5Account.from(mt5AccountOrigin.value)
+  mt5Account.value.programName = props.programName
 }
 
 const closeModal = () => {
@@ -73,18 +77,32 @@ const closeModal = () => {
   mt5Account.value = Mt5Account.blank()
 }
 
+const handleChangeAccountType = (value: Mt5AccountType) => {
+  if (value === Mt5AccountType.Demo) {
+    mt5Account.value.timeCorrectionSeconds = -10800
+  } else {
+    mt5Account.value.timeCorrectionSeconds = 0
+  }
+
+  if (value === Mt5AccountType.ExnessCent) {
+    mt5Account.value.symbolSuffix = 'c'
+  } else if (value === Mt5AccountType.ExnessStandard) {
+    mt5Account.value.symbolSuffix = 'm'
+  } else {
+    mt5Account.value.symbolSuffix = ''
+  }
+}
+
 const handleSave = async () => {
   try {
     if (!mt5AccountOrigin.value.id) {
       await Mt5AccountApi.createOne({
         mt5Account: mt5Account.value,
-        programName: programName.value,
       })
     } else {
       await Mt5AccountApi.updateOne({
         id: mt5AccountOrigin.value.id,
         mt5Account: mt5Account.value,
-        programName: programName.value,
       })
     }
     closeModal()
@@ -108,17 +126,27 @@ defineExpose({ openModal })
 
       <div class="start-copy-modal-body flex flex-wrap gap-4">
         <div class="" style="flex: 1 1 40%; min-width: 250px">
-          <label>Account Name</label>
+          <label>Account Type</label>
           <div>
-            <InputText :value="mt5Account.accountName" disabled />
+            <InputSelect v-model:value="mt5Account.accountType" :options="accountTypeOptions"
+              @update:value="(v: any) => handleChangeAccountType(v)" />
           </div>
         </div>
+
         <div class="" style="flex: 1 1 40%; min-width: 250px">
           <label>Account Server</label>
           <div>
             <InputText :value="mt5Account.accountServer" disabled />
           </div>
         </div>
+
+        <div class="" style="flex: 1 1 40%; min-width: 250px">
+          <label>Account Name</label>
+          <div>
+            <InputText :value="mt5Account.accountName" disabled />
+          </div>
+        </div>
+
         <div class="" style="flex: 1 1 40%; min-width: 250px">
           <label>Account Login</label>
           <div>
@@ -126,29 +154,50 @@ defineExpose({ openModal })
           </div>
         </div>
 
-        <div class="" style="flex: 1 1 40%; min-width: 250px">
-          <label>Account Type</label>
+        <!-- <div class="" style="flex: 1 1 40%; min-width: 250px">
+          <label>Account Password</label>
           <div>
-            <InputSelect v-model:value="mt5Account.accountType" :options="accountTypeOptions" />
+            <InputText :value="mt5Account.accountPassword" disabled />
+          </div>
+        </div> -->
+
+        <div class="" style="flex: 1 1 40%; min-width: 250px">
+          <label>Symbol Suffix</label>
+          <div>
+            <InputText v-model:value="mt5Account.symbolSuffix" />
           </div>
         </div>
 
-        <div class="" style="flex: 1 1 100%">
+        <div class="" style="flex: 1 1 40%; min-width: 250px">
+          <label>Time Correction Seconds</label>
+          <div>
+            <InputNumber v-model:value="mt5Account.timeCorrectionSeconds" :step="1" />
+          </div>
+        </div>
+
+        <div class="" style="flex: 1 1 90%; min-width: 250px">
           <label>Description</label>
           <div>
             <InputText v-model:value="mt5Account.description" />
           </div>
         </div>
 
-        <template v-if="mt5Account.accountType === Mt5AccountType.FOLLOWER">
-          <div class="" style="flex: 1 1 200px">
+        <div class="" style="flex: 1 1 90%; min-width: 250px">
+          <label>Account Role</label>
+          <div>
+            <InputSelect v-model:value="mt5Account.accountRole" :options="accountRoleOptions" />
+          </div>
+        </div>
+
+        <template v-if="mt5Account.accountRole === Mt5AccountRole.Follower">
+          <div class="" style="flex: 1 1 40%; min-width: 250px">
             <label>Copy Master Login</label>
             <div>
               <InputSelect v-model:value="mt5Account.copyMasterLogin" :options="copyMasterLoginOptions" />
             </div>
           </div>
 
-          <div class="" style="flex: 1 1 200px">
+          <div class="" style="flex: 1 1 40%; min-width: 250px">
             <label>Copy Multiplier</label>
             <div>
               <InputNumber v-model:value="mt5Account.copyMultiplier" :step="0.1" :validate="{ '>': 0 }" />

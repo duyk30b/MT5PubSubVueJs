@@ -20,7 +20,7 @@ const props = defineProps({
   position: {
     type: Object as PropType<{
       vertical: 'top' | 'bottom' | 'middle'
-      horizontal: 'start' | 'end' | 'center'
+      horizontal: 'full' | 'start' | 'end' | 'center'
     }>,
     default: () => ({ vertical: 'top', horizontal: 'center' }),
   },
@@ -38,7 +38,7 @@ const props = defineProps({
 
 const positionFix = reactive<{
   vertical: 'top' | 'bottom' | 'middle'
-  horizontal: 'start' | 'end' | 'center'
+  horizontal: 'full' | 'start' | 'end' | 'center'
   maxHeightFix: boolean
   maxHeightValue: number
 }>({
@@ -102,15 +102,20 @@ const calculatePosition = () => {
     }
   }
 
-  const spaceDropdownRectWidth =
-    props.position.horizontal === 'center' ? dropdownRect.width / 2 : dropdownRect.width
-  if (props.position.horizontal !== 'end' && spaceRight < spaceDropdownRectWidth) {
-    positionFix.horizontal = 'end'
-  } else if (props.position.horizontal !== 'start' && spaceLeft < spaceDropdownRectWidth) {
-    positionFix.horizontal = 'start'
+  if (dropdownRect.width + 20 >= viewportWidth) {
+    positionFix.horizontal = 'full'
   } else {
-    positionFix.horizontal = props.position.horizontal
+    const spaceDropdownRectWidth =
+      props.position.horizontal === 'center' ? dropdownRect.width / 2 : dropdownRect.width
+    if (props.position.horizontal !== 'end' && spaceRight < spaceDropdownRectWidth) {
+      positionFix.horizontal = 'end'
+    } else if (props.position.horizontal !== 'start' && spaceLeft < spaceDropdownRectWidth) {
+      positionFix.horizontal = 'start'
+    } else {
+      positionFix.horizontal = props.position.horizontal
+    }
   }
+
 
   // Start edit CSS
   if (positionFix.vertical === 'top') {
@@ -124,7 +129,11 @@ const calculatePosition = () => {
     dropdownContentRef.value.style.transformOrigin = 'top'
   }
 
-  if (positionFix.horizontal === 'start') {
+  if (positionFix.horizontal === 'full') {
+    dropdownContentRef.value.style.left = '0px'
+    dropdownContentRef.value.style.width = '100%'
+  }
+  else if (positionFix.horizontal === 'start') {
     dropdownContentRef.value.style.left = triggerRect.left + window.scrollX + 'px'
     if (dropdownArrowRef.value) {
       if (triggerRect.width < 50) {
@@ -232,13 +241,8 @@ onBeforeUnmount(() => {
     <slot name="trigger"></slot>
     <Teleport to="body">
       <Transition :name="position.vertical === 'top' ? 'slide-up' : 'slide-down'">
-        <div
-          v-if="isOpen"
-          ref="dropdownContentRef"
-          class="dropdown-content"
-          :class="isClick ? 'dropdown-content-clicked' : ''"
-          :style="customStyle?.dropdownContent || ''"
-        >
+        <div v-if="isOpen" ref="dropdownContentRef" class="dropdown-content"
+          :class="isClick ? 'dropdown-content-clicked' : ''" :style="customStyle?.dropdownContent || ''">
           <!-- Lỗi sinh ra 1 cái scroll mà chưa biết sửa thế nào -->
           <!-- <div
             v-if="customStyle?.arrow"
@@ -269,18 +273,22 @@ onBeforeUnmount(() => {
   top: 0; // quan trọng, nếu không set top, mặc định nó sẽ rơi xuống dưới, khi đó thanh scroll xuất hiện đẩy lệch mọi thứ đi
   left: 0;
   overflow: auto;
+
   &.dropdown-content-clicked {
     border: 1px solid #cdcdcd;
   }
+
   .dropdown-arrow {
     position: absolute;
     width: 10px;
     height: 6px;
     background-color: white;
+
     &.arrow-top {
       top: calc(100% - 1px);
       clip-path: polygon(0 0, 50% 100%, 100% 0);
     }
+
     &.arrow-bottom {
       top: -6px;
       clip-path: polygon(0 100%, 50% 0, 100% 100%);

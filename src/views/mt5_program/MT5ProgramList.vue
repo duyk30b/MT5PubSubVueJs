@@ -17,7 +17,7 @@ import VueTooltip from '@/common/popover/VueTooltip.vue'
 import { AlertStore } from '@/common/vue-alert/vue-alert.store'
 import { VueSwitch } from '@/common/vue-form'
 import { CONFIG } from '@/config'
-import { Mt5AccountType } from '@/modules/mt5_account/mt5_account.model.ts'
+import { Mt5AccountRole } from '@/modules/mt5_account/mt5_account.model.ts'
 import { MT5ProgramApi } from '@/modules/mt5_program/mt5_program.api.ts'
 import type { MT5ProgramInfo } from '@/modules/mt5_program/mt5_program_info.model.ts'
 import { useMt5ProgramStore } from '@/stores/mt5_program.store.ts'
@@ -122,24 +122,11 @@ const handleClickRefreshAll = async () => {
   }
 }
 
-const handleClickOpenAll = async () => {
-  keyLoading.value = 'OPEN_ALL'
+const handleClickClearAllLog = async () => {
+  keyLoading.value = 'CLEAR_ALL_LOG'
   realTimeEnabled.value = false
   try {
-    await MT5ProgramApi.openAll()
-  } catch (error: any) {
-    AlertStore.addError(error.message)
-  } finally {
-    keyLoading.value = ''
-    realTimeEnabled.value = true
-  }
-}
-
-const handleClickCloseAll = async () => {
-  keyLoading.value = 'CLOSE_ALL'
-  realTimeEnabled.value = false
-  try {
-    await MT5ProgramApi.closeAll()
+    await MT5ProgramApi.clearAllLog()
   } catch (error: any) {
     AlertStore.addError(error.message)
   } finally {
@@ -276,7 +263,7 @@ const handleClickClearError = async (program: MT5ProgramInfo) => {
               <VueSwitch v-model:modelValue="realTimeEnabled" :size="'18px'" />
               <span>Real time:</span>
               <span class="text-xs text-gray-500">
-                {{ ESTimer.timeToText(mt5ProgramStore.event_time, 'YYYY-MM-DD hh:mm:ss') }}
+                {{ mt5ProgramStore.event_time }}
               </span class="text-xs text-gray-500">
             </div>
           </div>
@@ -290,11 +277,9 @@ const handleClickClearError = async (program: MT5ProgramInfo) => {
             :loading="keyLoading === 'REFRESH_ALL'">
             REFRESH ALL
           </VueButton>
-          <VueButton size="small" color="green" :icon="IconControl" @click="handleClickOpenAll">
-            Open All
-          </VueButton>
-          <VueButton size="small" color="red" :icon="IconClose" @click="handleClickCloseAll">
-            Close All
+          <VueButton size="small" color="blue" :icon="IconControl" @click="handleClickClearAllLog"
+            :loading="keyLoading === 'CLEAR_ALL_LOG'">
+            Clear All Log
           </VueButton>
         </div>
       </div>
@@ -434,14 +419,14 @@ const handleClickClearError = async (program: MT5ProgramInfo) => {
 
       <div class="mt5-position-table-wrap">
         <div class="mt5-position-head">
-          <h3 class="flex items-center gap-2">
+          <h3 class="flex flex-wrap items-center gap-2">
             <span>{{ program.data.position_list?.length || 0 }} Positions:</span>
             <span>{{ program.data.refresh_time || '-' }}</span>
           </h3>
-          <template v-if="program?.mt5_account?.accountType === Mt5AccountType.MASTER">
+          <template v-if="program?.mt5_account?.accountRole === Mt5AccountRole.Master">
             <VueTag color="cyan">Account Master</VueTag>
           </template>
-          <template v-if="program?.mt5_account?.accountType === Mt5AccountType.FOLLOWER">
+          <template v-if="program?.mt5_account?.accountRole === Mt5AccountRole.Follower">
             <VueButton v-if="!program.mt5_account.isCopying" size="small" color="purple" :icon="IconCopy"
               @click="handleClickCopyEnabled(program)" :loading="keyLoading === `COPY_ENABLED_${program.program_name}`">
               Start Copy From {{ program?.mt5_account?.copyMasterLogin || '-' }}
@@ -503,7 +488,13 @@ const handleClickClearError = async (program: MT5ProgramInfo) => {
                   </VueTag>
                 </td>
                 <td>{{ position.volume }}</td>
-                <td>{{ ESTimer.timeToText(position.time_msc, 'YYYY-MM-DD hh:mm:ss', 7) }}</td>
+                <td>
+                  {{
+                    ESTimer.timeToText(
+                      position.time_msc + program.mt5_account.timeCorrectionSeconds * 1000,
+                      'YYYY-MM-DD hh:mm:ss', 7)
+                  }}
+                </td>
                 <td style="text-align: center">
                   {{ formatNumber(position.price_open) }} ➞
                   {{ formatNumber(position.price_current) }}
@@ -809,6 +800,7 @@ const handleClickClearError = async (program: MT5ProgramInfo) => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
 
     h3 {
       margin: 0;

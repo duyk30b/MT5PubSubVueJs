@@ -6,13 +6,8 @@ export class MT5ProgramApi {
     return response
   }
 
-  static async openAll() {
-    const response = await FetchApi.post(`/mt5_program/open_all`)
-    return response
-  }
-
-  static async closeAll() {
-    const response = await FetchApi.post(`/mt5_program/close_all`)
+  static async clearAllLog() {
+    const response = await FetchApi.post(`/mt5_program/clear_all_log`)
     return response
   }
 
@@ -30,7 +25,7 @@ export class MT5ProgramApi {
     const response = await FetchApi.post(`/mt5_program/close/${params.program_name}`)
     return response
   }
-  
+
   static async copyEnabled(params: { program_name: string }) {
     const response = await FetchApi.post(`/mt5_program/copy_enabled/${params.program_name}`)
     return response

@@ -2,7 +2,6 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
 import { IndexedDBConnection } from './core/indexed-db'
-import { SocketBase } from './core/socket/socket.base'
 import { Router } from './router/router'
 
 // import tailwind css first
@@ -11,7 +10,7 @@ import './assets/tailwind.css'
 import './assets/main.scss'
 // then import common scss
 import './common/_scss/vue-common.scss'
-import { setupContainer } from './setup_container.ts'
+import { setupContainer } from './setup/setup_container.ts'
 
 const start = async () => {
   setupContainer()

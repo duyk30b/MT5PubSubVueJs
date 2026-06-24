@@ -9,7 +9,7 @@ export const SettingKeyLabelMap: Record<SettingKey, string> = {
 }
 
 export const SettingKeyExampleMap: Record<SettingKey, string> = {
-  [SettingKey.MT5_CONTAINER_FOLDER_PATH]: 'D:\\Programs\\MetaTrader5',
+  [SettingKey.MT5_CONTAINER_FOLDER_PATH]: 'C:\\Programs\\MetaTrader5',
 }
 
 export class Setting extends BaseModel {

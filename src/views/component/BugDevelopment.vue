@@ -23,11 +23,11 @@ const handleIsOpenChange = (value: boolean) => {
 </script>
 
 <template>
-  <VueTooltip :maxHeight="maxHeight" :maxWidth="maxWidth" @update:is-open="handleIsOpenChange">
+  <VueTooltip :maxHeight="maxHeight" :maxWidth="`min(100%, ${maxWidth})`" @update:is-open="handleIsOpenChange">
     <template #trigger>
       <IconBug style="color: violet; cursor: pointer" width="1.2em" height="1.2em" />
     </template>
-    <JsonViewer :text="JSON.stringify(data, null, 4)" theme="dark"/>
+    <JsonViewer :text="JSON.stringify(data, null, 4)" theme="dark" />
     <!-- <pre style="">{{ JSON.stringify(data, null, 4) }}</pre> -->
   </VueTooltip>
 </template>
@@ -37,6 +37,7 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
 /* pre {
   white-space: pre-wrap;
   overflow-wrap: break-word;

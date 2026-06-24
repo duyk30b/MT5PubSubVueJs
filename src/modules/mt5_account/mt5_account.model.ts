@@ -1,21 +1,35 @@
 import { BaseModel } from '../_base/base.model'
 import { Role } from '../role/role.model'
 
+export enum Mt5AccountRole {
+  Normal = 0,
+  Master = 1,
+  Follower = 2,
+}
+
 export enum Mt5AccountType {
-  NORMAL = 0,
-  MASTER = 1,
-  FOLLOWER = 2,
+  Unknown = 0,
+  Demo = 1,
+  ExnessCent = 2,
+  ExnessStandard = 3,
+  ExnessPro = 4,
+  ExnessRaw = 5,
+  ExnessZero = 6,
 }
 
 export class Mt5Account extends BaseModel {
   id: number
+  accountRole: Mt5AccountRole
   accountType: Mt5AccountType
   accountLogin: number
   accountName: string
   accountServer: string
   accountPassword: string
 
+  symbolSuffix: string
+  timeCorrectionSeconds: number
   programName: string
+
   isOpening: boolean
   isCopying: boolean
 
@@ -27,13 +41,17 @@ export class Mt5Account extends BaseModel {
     const ins = new Mt5Account()
     ins._localId = String(s?.id || Math.random().toString(36).substring(2))
     ins.id = s?.id || 0
-    ins.accountType = s?.accountType || Mt5AccountType.NORMAL
+    ins.accountRole = s?.accountRole || Mt5AccountRole.Normal
+    ins.accountType = s?.accountType || Mt5AccountType.Unknown
     ins.accountName = s?.accountName || ''
     ins.accountServer = s?.accountServer || ''
     ins.accountLogin = s?.accountLogin || 0
     ins.accountPassword = s?.accountPassword || ''
-    
+
+    ins.symbolSuffix = s?.symbolSuffix || ''
+    ins.timeCorrectionSeconds = s?.timeCorrectionSeconds || 0
     ins.programName = s?.programName || ''
+
     ins.isOpening = s?.isOpening || false
     ins.isCopying = s?.isCopying || false
 
@@ -74,13 +92,17 @@ export class Mt5Account extends BaseModel {
 
   static equal(a: Mt5Account, b: Mt5Account) {
     if (a.id != b.id) return false
+    if (a.accountRole != b.accountRole) return false
     if (a.accountType != b.accountType) return false
     if (a.accountName != b.accountName) return false
     if (a.accountServer != b.accountServer) return false
     if (a.accountLogin != b.accountLogin) return false
     if (a.accountPassword != b.accountPassword) return false
 
+    if (a.symbolSuffix != b.symbolSuffix) return false
+    if (a.timeCorrectionSeconds != b.timeCorrectionSeconds) return false
     if (a.programName != b.programName) return false
+
     if (a.isOpening != b.isOpening) return false
     if (a.isCopying != b.isCopying) return false
 

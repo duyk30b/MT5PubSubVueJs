@@ -1,4 +1,9 @@
-import { createRouter, createWebHashHistory, createWebHistory, type RouteLocationNormalizedLoaded } from 'vue-router'
+import {
+  createRouter,
+  createWebHashHistory,
+  createWebHistory,
+  type RouteLocationNormalizedLoaded,
+} from 'vue-router'
 import { ROUTER_NAME } from './router_name.ts'
 
 enum AuthLevel {
