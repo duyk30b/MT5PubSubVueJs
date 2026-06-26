@@ -492,7 +492,7 @@ const handleClickClearError = async (program: MT5ProgramInfo) => {
                   {{
                     ESTimer.timeToText(
                       position.time_msc + program.mt5_account.timeCorrectionSeconds * 1000,
-                      'YYYY-MM-DD hh:mm:ss', 7)
+                      'YYYY-MM-DD hh:mm:ss.xxx', 7)
                   }}
                 </td>
                 <td style="text-align: center">
