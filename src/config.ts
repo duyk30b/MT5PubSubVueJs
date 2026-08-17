@@ -11,7 +11,7 @@ export const CONFIG = reactive({
   BUILD_TIME: '',
 })
 ;(window as any)._MEA_CONFIG = CONFIG
-// CONFIG.API_BASE_URL = 'https://api_mt5.mediai.vn'
+CONFIG.API_BASE_URL = 'https://api_mt5.mediai.vn'
 
 const loadConfig = async () => {
   try {
